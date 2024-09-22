@@ -5,7 +5,7 @@ global:
 
 image:
   repository: "otel/opentelemetry-collector-contrib"
-  tag: "0.105.0"
+  tag: "0.109.0"
 
 command:
   name: "otelcol-contrib"
@@ -29,6 +29,15 @@ ports:
     hostPort: 4318
     nodePort: 30318
     protocol: TCP
+  # add otel tcplog receiver: https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/tcplogreceiver
+  otlp-tcplog: 
+    enabled: true
+    containerPort: 5318
+    servicePort: 5318
+    hostPort: 5318
+    nodePort: 35318
+    protocol: TCP
+
   jaeger-compact:
     enabled: false
   jaeger-thrift:
