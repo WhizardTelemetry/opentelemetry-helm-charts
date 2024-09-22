@@ -119,7 +119,7 @@ config:
           value: "<cluster-name>"
   receivers:
     tcplog:
-      endpoint: ${env:MY_POD_IP}:5318
+      listen_address: ${env:MY_POD_IP}:5318
     ## Only keep the otlp receiver in the default values
     jaeger: null
     prometheus: null
