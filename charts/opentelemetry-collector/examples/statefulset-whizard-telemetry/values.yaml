@@ -81,6 +81,8 @@ config:
   exporters:
     otlp/signoz:
       endpoint: my-release-signoz-otel-collector.platform.svc:4317
+      tls:
+        insecure: true
     ## Refer to https://github.com/open-telemetry/opentelemetry-collector/tree/main/exporter/debugexporter for more detailes.
     debug:
       #verbosity: detailed
