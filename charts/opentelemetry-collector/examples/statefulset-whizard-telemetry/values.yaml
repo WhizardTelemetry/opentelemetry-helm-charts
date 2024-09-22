@@ -35,7 +35,7 @@ ports:
     containerPort: 5318
     servicePort: 5318
     hostPort: 5318
-    nodePort: 35318
+    nodePort: 30518
     protocol: TCP
 
   jaeger-compact:
