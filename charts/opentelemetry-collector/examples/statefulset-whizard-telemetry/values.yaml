@@ -79,6 +79,8 @@ extraVolumeMounts:
 
 config:
   exporters:
+    otlp/signoz:
+      endpoint: my-release-signoz-otel-collector.platform.svc:4317
     ## Refer to https://github.com/open-telemetry/opentelemetry-collector/tree/main/exporter/debugexporter for more detailes.
     debug:
       #verbosity: detailed
@@ -112,10 +114,12 @@ config:
       check_interval: 5s
     attributes:
       actions:
-        - key: whizard.cluster.name
+        - key: wiz.cluster.name
           action: insert
           value: "<cluster-name>"
   receivers:
+    tcplog:
+      endpoint: ${env:MY_POD_IP}:5318
     ## Only keep the otlp receiver in the default values
     jaeger: null
     prometheus: null
@@ -134,4 +138,11 @@ config:
         exporters:
           # - prometheusremotewrite
           - debug
-      logs: null
+      logs:
+        exporters:
+          - otlp/signoz
+        processors:
+          - memory_limiter
+          - batch
+        receivers:
+          - tcplog
