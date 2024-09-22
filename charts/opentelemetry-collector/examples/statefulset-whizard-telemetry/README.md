@@ -8,7 +8,7 @@
 ```shell
 # Go to the charts/opentelemetry-collector directory
 cd ..
-helm upgrade --install --force -n opentelemetry --create-namespace -f examples/statefulset-whizard-telemetry/values.yaml opentelemetry-collector-contrib ./
+helm upgrade --install --force -n opentelemetry --create-namespace -f examples/statefulset-whizard-telemetry/values.yaml wiz ./
 ```
 Suppose your OpenTelemetry Collector expose its service at `http://172.31.18.2:30318`
 
