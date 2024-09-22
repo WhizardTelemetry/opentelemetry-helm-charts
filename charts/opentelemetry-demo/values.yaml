@@ -25,6 +25,8 @@ default:
     pullSecrets: []
   # Default # of replicas for all components
   replicas: 1
+  # default revisionHistoryLimit for all components (number of old ReplicaSets to retain)
+  revisionHistoryLimit: 10
   # Default schedulingRules for all components
   schedulingRules:
     nodeSelector: {}
@@ -143,6 +145,9 @@ components:
   #       command: [list of commands for the init container to run]
   # # Replicas for the component
   #  replicas: 1
+  # # Number of old ReplicaSets to retain
+  #  revisionHistoryLimit: 10
+
   # # Optional pod security context for setting user ID (UID), group ID (GID) and other security policies
   # # This will be applied at pod level, can be applied globally for all pods: .Values.default.podSecurityContext
   # # Or it can be applied to a specific component: .Values.components.<component-name>.podSecurityContext
@@ -559,7 +564,7 @@ components:
     enabled: true
     imageOverride:
       repository: "ghcr.io/open-feature/flagd"
-      tag: "v0.10.1"
+      tag: "v0.11.1"
     useDefault:
       env: true
     replicas: 1
@@ -690,6 +695,17 @@ opentelemetry-collector:
             insecure: true
 
     processors:
+      # This processor is used to help limit high cardinality on next.js span names
+      # When this PR is merged (and released) we can remove this transform processor
+      # https://github.com/vercel/next.js/pull/64852
+      transform:
+        error_mode: ignore
+        trace_statements:
+          - context: span
+            statements:
+              # could be removed when https://github.com/vercel/next.js/pull/64852 is fixed upstream
+              - replace_pattern(name, "\\?.*", "")
+              - replace_match(name, "GET /api/products/*", "GET /api/products/{productId}")
       resource:
         attributes:
         - key: service.instance.id
@@ -702,7 +718,7 @@ opentelemetry-collector:
     service:
       pipelines:
         traces:
-          processors: [memory_limiter, resource, batch]
+          processors: [memory_limiter, resource, transform, batch]
           exporters: [otlp, debug, spanmetrics]
         metrics:
           receivers: [httpcheck/frontendproxy, redis, otlp, spanmetrics]
@@ -761,6 +777,8 @@ prometheus:
       scrape_interval: 5s
       scrape_timeout: 3s
       evaluation_interval: 30s
+    tsdb:
+      out_of_order_time_window: 30m
     persistentVolume:
       enabled: false
     service:
